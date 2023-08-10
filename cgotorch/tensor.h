@@ -1,7 +1,7 @@
 /* Copyright 2020, GoTorch Authors */
 #pragma once
 
-#include "cgotorch/torch.h"
+#include "torch.h"
 
 #ifdef __cplusplus
 extern "C" {

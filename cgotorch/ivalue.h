@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cgotorch/torchdef.h"
+#include "torchdef.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/init.h"
+#include "init.h"
 
 #include <string>
 #include <unordered_map>

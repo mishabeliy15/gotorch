@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/tensor.h"
+#include "tensor.h"
 
 #include <string>
 #include <vector>

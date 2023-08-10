@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/optim.h"
+#include "optim.h"
 
 #include <vector>
 
