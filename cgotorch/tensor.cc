@@ -332,6 +332,15 @@ const char *Tensor_Zeros(int8_t dtype, int64_t *sizes_data,
   }
 }
 
+const char *Tensor_Ones_Like(Tensor input, Tensor *result) {
+  try {
+    *result = new at::Tensor(at::ones_like(*input));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
 const char *Tensor_IndexPut(Tensor input, int64_t index, Tensor source) {
   try {
     (*input)[index] = *source;

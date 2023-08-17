@@ -10,7 +10,7 @@ mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR" || exit 1
 
 cmake ..
-make
+make $1
 cp -f *.so "$BASE_DIR"
 cp -f *.dylib "$BASE_DIR"
 rm -rf "$BUILD_DIR"

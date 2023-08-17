@@ -330,6 +330,16 @@ func CreateZeros(shape []int64, dtype int8) Tensor {
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
 
+// CreateOnesLike creates a tensor filled with ones
+func CreateOnesLike(a Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Ones_Like(
+		C.Tensor(*a.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
 // IndexPut calls Tensor::index_put_(tensor[index]=value) to put value in index
 func (a Tensor) IndexPut(index int64, value Tensor) {
 	MustNil(unsafe.Pointer(C.Tensor_IndexPut(
