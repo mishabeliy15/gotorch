@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/device.h"
+#include "device.h"
 
 #include <string>
 #include <unordered_map>

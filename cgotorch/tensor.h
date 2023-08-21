@@ -1,7 +1,7 @@
 /* Copyright 2020, GoTorch Authors */
 #pragma once
 
-#include "cgotorch/torch.h"
+#include "torch.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,7 +31,22 @@ const char *Tensor_CopyTo(Tensor input, Device device, Tensor *output);
 const char *Tensor_PinMemory(Tensor input, Tensor *output);
 const char *Tensor_CUDA(Tensor input, Device device, int8_t non_blocking,
                         Tensor *output);
-
+const char *Tensor_Reshape(Tensor input, int64_t *shape, int64_t shape_len,
+                           Tensor *result);
+const char *Tensor_Split(Tensor input, int64_t split_size, int64_t dim,
+                         Tensor *results, int64_t *results_len);
+const char *Tensor_Slice(Tensor input, int64_t dim, int64_t start, int64_t end,
+                         int64_t step, Tensor *result);
+const char *Tensor_Norm(Tensor input, int64_t p, int64_t dim, Tensor *result);
+const char *Tensor_Unsqueeze(Tensor input, int64_t dim, Tensor *result);
+const char *Tensor_GeScalar(Tensor input, float other, Tensor *result);
+const char *Tensor_NonZero(Tensor input, Tensor *result);
+const char *Tensor_Zeros(int8_t dtype, int64_t *sizes_data,
+                         int64_t sizes_data_len, Tensor *result);
+const char *Tensor_Ones_Like(Tensor input, Tensor *result);
+const char *Tensor_IndexPut(Tensor input, int64_t index, Tensor source);
+const char *Tensor_IndexByTensors(Tensor input, Tensor *indexes, int64_t index_len, Tensor *result);
+const char *Tensor_Device(Tensor input, Device *device);
 ////////////////////////////////////////////////////////////////////////////////
 // Backward, Gradient
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,6 +64,9 @@ const char *ItemFloat64(Tensor a, double *result);
 
 const char *Tensor_Index(Tensor a, int64_t *index, int64_t index_len,
                          Tensor *result);
+const char *Tensor_ToArray(Tensor input, void *result);
+const char *Tensor_Select(Tensor input, int64_t dim, int64_t index,
+                          Tensor *result);
 
 #ifdef __cplusplus
 }

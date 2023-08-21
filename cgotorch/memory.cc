@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/memory.h"
+#include "memory.h"
 
 thread_local bool gcPrepared = false;
 

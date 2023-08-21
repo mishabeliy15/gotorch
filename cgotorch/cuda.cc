@@ -3,7 +3,7 @@
 #include "c10/cuda/CUDAStream.h"
 #endif
 
-#include "cgotorch/cuda.h"
+#include "cuda.h"
 
 bool IsCUDAAvailable() { return torch::cuda::is_available(); }
 

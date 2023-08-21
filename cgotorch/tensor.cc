@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/tensor.h"
+#include "tensor.h"
 
 #include <string>
 #include <vector>
@@ -206,6 +206,166 @@ const char *Tensor_Index(Tensor input, int64_t *index, int64_t index_len,
     }
     at::ArrayRef<at::indexing::TensorIndex> ref(indices.data(), index_len);
     *result = new at::Tensor(input->index(ref));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Reshape(Tensor input, int64_t *shape, int64_t shape_len,
+                           Tensor *result) {
+  try {
+    std::vector<int64_t> s(shape, shape + shape_len);
+    *result = new at::Tensor(input->reshape(at::IntArrayRef(s)));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Split(Tensor input, int64_t split_size, int64_t dim,
+                         Tensor *results, int64_t *results_len) {
+  try {
+      auto split = input->split(split_size, dim);
+      *results_len = split.size();
+      for (int i = 0; i < *results_len; i++) {
+        results[i] = new at::Tensor(split[i]);
+      }
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Slice(Tensor input, int64_t dim, int64_t start, int64_t end,
+                         int64_t step, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->slice(dim, start, end, step));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Norm(Tensor input, int64_t p, int64_t dim, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->norm(p, dim));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Unsqueeze(Tensor input, int64_t dim, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->unsqueeze(dim));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_ToArray(Tensor input, void *result) {
+  try {
+    auto tensor = input->contiguous();
+    auto dtype = tensor.scalar_type();
+    auto size = tensor.numel();
+    switch (dtype) {
+      case torch::kFloat:
+        memcpy(result, tensor.data_ptr<float>(), sizeof(float) * size);
+        break;
+      case torch::kDouble:
+        memcpy(result, tensor.data_ptr<double>(), sizeof(double) * size);
+        break;
+      case torch::kInt32:
+        memcpy(result, tensor.data_ptr<int32_t>(), sizeof(int32_t) * size);
+        break;
+      case torch::kInt64:
+        memcpy(result, tensor.data_ptr<int64_t>(), sizeof(int64_t) * size);
+        break;
+      default:
+        return "Unsupported data type";
+    }
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Select(Tensor input, int64_t dim, int64_t index,
+                          Tensor *result) {
+  try {
+    *result = new at::Tensor(input->select(dim, index));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_GeScalar(Tensor input, float other, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->ge(other));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_NonZero(Tensor input, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->nonzero());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Zeros(int8_t dtype, int64_t *sizes_data,
+                         int64_t sizes_data_len, Tensor *result) {
+  try {
+    auto t = at::zeros(at::IntArrayRef(sizes_data, sizes_data_len),
+                       torch::dtype(at::ScalarType(dtype)));
+    *result = new at::Tensor(t);
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Ones_Like(Tensor input, Tensor *result) {
+  try {
+    *result = new at::Tensor(at::ones_like(*input));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_IndexPut(Tensor input, int64_t index, Tensor source) {
+  try {
+    (*input)[index] = *source;
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_IndexByTensors(Tensor input, Tensor *indexes, int64_t index_len, Tensor *result) {
+  try {
+    std::vector<at::indexing::TensorIndex> indices_vector;
+    for (int64_t i = 0; i < index_len; ++i) {
+      indices_vector.emplace_back(*indexes[i]);
+    }
+    *result = new at::Tensor(input->index(indices_vector));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Device(Tensor input, Device *device) {
+  try {
+    *device = new at::Device(input->device());
     return nullptr;
   } catch (const std::exception &e) {
     return exception_str(e.what());

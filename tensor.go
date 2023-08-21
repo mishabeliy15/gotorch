@@ -4,7 +4,7 @@ package gotorch
 
 // #cgo CFLAGS: -I ${SRCDIR}
 // #cgo LDFLAGS: -L ${SRCDIR}/cgotorch -Wl,-rpath ${SRCDIR}/cgotorch -lcgotorch
-// #cgo LDFLAGS: -L ${SRCDIR}/cgotorch/libtorch/lib -Wl,-rpath ${SRCDIR}/cgotorch/libtorch/lib -lc10 -ltorch -ltorch_cpu
+// #cgo LDFLAGS: -lc10 -ltorch -ltorch_cpu
 // #include "cgotorch/cgotorch.h"
 import "C"
 
@@ -188,4 +188,185 @@ func (a Tensor) Index(index ...int64) Tensor {
 		C.int64_t(len(index)), &t)))
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Reshape calls Tensor::reshape to return a tensor with the given shape
+func (a Tensor) Reshape(sizes ...int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Reshape(
+		C.Tensor(*a.T),
+		(*C.int64_t)(unsafe.Pointer(&sizes[0])),
+		C.int64_t(len(sizes)), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+func tensorListToSlice(ts []C.Tensor, cLength C.int64_t) []Tensor {
+	length := int64(cLength)
+	if length == 0 {
+		return nil
+	}
+	results := make([]Tensor, 0, length)
+	for i := int64(0); i < length; i++ {
+		t2 := ts[i]
+		SetTensorFinalizer((*unsafe.Pointer)(&t2))
+		results = append(results, Tensor{
+			T: (*unsafe.Pointer)(&ts[i]),
+		})
+	}
+	return results
+}
+
+// Split calls Tensor::split to return a slice of tensors
+func (a Tensor) Split(splitSize int64, dim int64) []Tensor {
+	shapes := a.Shape()
+	resSize := (shapes[dim] + splitSize - 1) / splitSize
+	ts := make([]C.Tensor, resSize)
+	var cLength C.int64_t
+	MustNil(unsafe.Pointer(C.Tensor_Split(
+		C.Tensor(*a.T),
+		C.int64_t(splitSize),
+		C.int64_t(dim),
+		&ts[0],
+		&cLength)))
+	return tensorListToSlice(ts, cLength)
+}
+
+// Slice calls Tensor::slice to return a slice of tensors
+func (a Tensor) Slice(dim int64, start int64, end int64, step int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Slice(
+		C.Tensor(*a.T),
+		C.int64_t(dim),
+		C.int64_t(start),
+		C.int64_t(end),
+		C.int64_t(step),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Norm calls Tensor::norm to return a tensor norm
+func (a Tensor) Norm(p int64, dim int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Norm(
+		C.Tensor(*a.T),
+		C.int64_t(p),
+		C.int64_t(dim),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Unsqueeze calls Tensor::unsqueeze to return a tensor with a dimension of size one
+func (a Tensor) Unsqueeze(dim int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Unsqueeze(
+		C.Tensor(*a.T),
+		C.int64_t(dim),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// LengthByShapes returns the length of a tensor by its shapes
+func (a Tensor) LengthByShapes() (shapes []int64, length int64) {
+	shapes = a.Shape()
+	length = int64(0)
+	for _, s := range shapes {
+		if s != 0 {
+			if length != 0 {
+				length *= s
+			} else {
+				length = s
+			}
+		}
+	}
+	return shapes, length
+}
+
+// Select calls Tensor::select to return a tensor with the given index
+func (a Tensor) Select(dim int64, index int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Select(
+		C.Tensor(*a.T),
+		C.int64_t(dim),
+		C.int64_t(index),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// GeScalar calls Tensor::ge to return a tensor with greater than or equal to the given scalar
+func (a Tensor) GeScalar(b float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_GeScalar(
+		C.Tensor(*a.T),
+		C.float(b),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// NonZero calls Tensor::nonzero to return a tensor with the indices of all non-zero elements
+func (a Tensor) NonZero() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_NonZero(
+		C.Tensor(*a.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// CreateZeros creates a tensor filled with zeros
+func CreateZeros(shape []int64, dtype int8) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Zeros(
+		C.int8_t(dtype),
+		(*C.int64_t)(unsafe.Pointer(&shape[0])),
+		C.int64_t(len(shape)),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// CreateOnesLike creates a tensor filled with ones
+func CreateOnesLike(a Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Ones_Like(
+		C.Tensor(*a.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// IndexPut calls Tensor::index_put_(tensor[index]=value) to put value in index
+func (a Tensor) IndexPut(index int64, value Tensor) {
+	MustNil(unsafe.Pointer(C.Tensor_IndexPut(
+		C.Tensor(*a.T),
+		C.int64_t(index),
+		C.Tensor(*value.T),
+	)))
+}
+
+// IndexByTensors calls Tensor::index() to return a tensor with the given indexes
+func (a Tensor) IndexByTensors(indexes []Tensor) Tensor {
+	var t C.Tensor
+	tensors := make([]C.Tensor, len(indexes))
+	for i, index := range indexes {
+		tensors[i] = C.Tensor(*index.T)
+	}
+	MustNil(unsafe.Pointer(C.Tensor_IndexByTensors(
+		C.Tensor(*a.T),
+		(*C.Tensor)(unsafe.Pointer(&tensors[0])),
+		C.int64_t(len(indexes)),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+func (a Tensor) Device() Device {
+	var d C.Device
+	MustNil(unsafe.Pointer(C.Tensor_Device(C.Tensor(*a.T), &d)))
+	return Device{d}
 }

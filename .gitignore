@@ -12,3 +12,6 @@ data
 trace.out
 *.log
 *.o
+.idea/
+*.so
+*.dylib

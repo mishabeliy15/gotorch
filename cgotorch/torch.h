@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "cgotorch/torchdef.h"
+#include "torchdef.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -49,8 +49,10 @@ const char *Tanh(Tensor a, Tensor *result);
 const char *Sigmoid(Tensor a, Tensor *result);
 const char *Add(Tensor a, Tensor other, float alpha, Tensor *result);
 const char *Add_(Tensor a, Tensor other, float alpha, Tensor *result);
+const char *Add_Scalar(Tensor a, float b, float alpha, Tensor *result);
 const char *Sub(Tensor a, Tensor other, float alpha, Tensor *result);
 const char *Sub_(Tensor a, Tensor other, float alpha, Tensor *result);
+const char *Sub_Scalar(Tensor a, float b, float alpha, Tensor *result);
 const char *Mul(Tensor a, Tensor other, Tensor *result);
 const char *Mul_(Tensor a, Tensor other, Tensor *result);
 const char *Div(Tensor a, Tensor other, Tensor *result);
@@ -65,6 +67,7 @@ const char *ExpandAs(Tensor a, Tensor other, Tensor *result);
 const char *Eq(Tensor a, Tensor other, Tensor *result);
 const char *IndexSelect(Tensor a, int64_t dim, Tensor index, Tensor *result);
 const char *View(Tensor a, Tensor *result, int64_t *size, int64_t size_len);
+const char *Softmax(Tensor a, int64_t dim, Tensor *result);
 const char *LogSoftmax(Tensor a, int64_t dim, Tensor *result);
 const char *Squeeze(Tensor a, Tensor *result);
 const char *SqueezeWithDim(Tensor a, int64_t dim, Tensor *result);
@@ -74,6 +77,8 @@ const char *Argmax(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result);
 const char *Mean(Tensor a, Tensor *result);
 const char *Stack(Tensor *tensors, int64_t tensors_size, int64_t dim,
                   Tensor *result);
+const char *Cat(Tensor *tensors, int64_t tensors_len, int64_t dim,
+                Tensor *result);
 #ifdef __cplusplus
 }
 #endif

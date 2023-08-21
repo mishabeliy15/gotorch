@@ -2,7 +2,7 @@ package gotorch
 
 // #cgo CFLAGS: -I ${SRCDIR}
 // #cgo LDFLAGS: -L ${SRCDIR}/cgotorch -Wl,-rpath ${SRCDIR}/cgotorch -lcgotorch
-// #cgo LDFLAGS: -L ${SRCDIR}/cgotorch/libtorch/lib -Wl,-rpath ${SRCDIR}/cgotorch/libtorch/lib -lc10 -ltorch -ltorch_cpu
+// #cgo LDFLAGS: -lc10 -ltorch -ltorch_cpu
 // #include "cgotorch/cgotorch.h"
 import "C"
 
@@ -29,6 +29,18 @@ func (a *Tensor) Add(other Tensor, alpha float32) Tensor {
 	return Add(*a, other, alpha)
 }
 
+// AddScalar torch.add
+func AddScalar(a Tensor, other float32, alpha float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Add_Scalar(C.Tensor(*a.T), C.float(other), C.float(alpha), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+func (a *Tensor) AddScalar(other float32, alpha float32) Tensor {
+	return AddScalar(*a, other, alpha)
+}
+
 // AddI adds in-place
 func (a *Tensor) AddI(other Tensor, alpha float32) Tensor {
 	var t C.Tensor
@@ -53,6 +65,19 @@ func Sub(a, other Tensor, alpha float32) Tensor {
 // Sub torch.sub
 func (a *Tensor) Sub(other Tensor, alpha float32) Tensor {
 	return Sub(*a, other, alpha)
+}
+
+// SubScalar torch.sub
+func SubScalar(a Tensor, other float32, alpha float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Sub_Scalar(C.Tensor(*a.T), C.float(other), C.float(alpha), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// SubScalar torch.sub
+func (a *Tensor) SubScalar(other float32, alpha float32) Tensor {
+	return SubScalar(*a, other, alpha)
 }
 
 // SubI subs in-place
@@ -249,6 +274,18 @@ func (a Tensor) LogSoftmax(dim int64) Tensor {
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
 
+func Softmax(t Tensor, dim int64) Tensor {
+	return t.Softmax(dim)
+}
+
+// Softmax returns softmax of the current tensor
+func (a Tensor) Softmax(dim int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Softmax(C.Tensor(*a.T), C.int64_t(dim), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
 // Mean returns mean of the current tensor
 func Mean(t Tensor) Tensor {
 	return t.Mean()
@@ -305,6 +342,19 @@ func Stack(tensors []Tensor, dim int64) Tensor {
 	p := (*C.Tensor)(unsafe.Pointer(&CT[0]))
 	var t C.Tensor
 	MustNil(unsafe.Pointer(C.Stack(p, C.int64_t(len(CT)), C.int64_t(dim), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Cat concatenates sequence of tensors along a given dimension
+func Cat(tensors []Tensor, dim int64) Tensor {
+	CT := make([]C.Tensor, 0, len(tensors))
+	for _, t := range tensors {
+		CT = append(CT, C.Tensor(*t.T))
+	}
+	p := (*C.Tensor)(unsafe.Pointer(&CT[0]))
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Cat(p, C.int64_t(len(CT)), C.int64_t(dim), &t)))
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
@@ -459,4 +509,60 @@ func (a Tensor) argMinMax(argmin bool, opts ...interface{}) Tensor {
 	}
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// ToFloat32Slice returns a float32 slice from a tensor
+func (a Tensor) ToFloat32Slice() (shapes []int64, data []float32) {
+	if a.Dtype() != Float {
+		panic("tensor.ToFloat32Slice() only supports float32")
+	}
+	shapes, length := a.LengthByShapes()
+	if length == 0 {
+		return shapes, nil
+	}
+	data = make([]float32, length)
+	MustNil(unsafe.Pointer(C.Tensor_ToArray(C.Tensor(*a.T), unsafe.Pointer(&data[0]))))
+	return shapes, data
+}
+
+// ToFloat64Slice returns a float64 slice from a tensor
+func (a Tensor) ToFloat64Slice() (shapes []int64, data []float64) {
+	if a.Dtype() != Double {
+		panic("tensor.ToFloat64Slice() only supports float64")
+	}
+	shapes, length := a.LengthByShapes()
+	if length == 0 {
+		return shapes, nil
+	}
+	data = make([]float64, length)
+	MustNil(unsafe.Pointer(C.Tensor_ToArray(C.Tensor(*a.T), unsafe.Pointer(&data[0]))))
+	return shapes, data
+}
+
+// ToInt32Slice returns an int32 slice from a tensor
+func (a Tensor) ToInt32Slice() (shapes []int64, data []int32) {
+	if a.Dtype() != Int {
+		panic("tensor.ToInt32Slice() only supports int32")
+	}
+	shapes, length := a.LengthByShapes()
+	if length == 0 {
+		return shapes, nil
+	}
+	data = make([]int32, length)
+	MustNil(unsafe.Pointer(C.Tensor_ToArray(C.Tensor(*a.T), unsafe.Pointer(&data[0]))))
+	return shapes, data
+}
+
+// ToInt64Slice returns an int64 slice from a tensor
+func (a Tensor) ToInt64Slice() (shapes []int64, data []int64) {
+	if a.Dtype() != Long {
+		panic("tensor.ToInt64Slice() only supports int64")
+	}
+	shapes, length := a.LengthByShapes()
+	if length == 0 {
+		return shapes, nil
+	}
+	data = make([]int64, length)
+	MustNil(unsafe.Pointer(C.Tensor_ToArray(C.Tensor(*a.T), unsafe.Pointer(&data[0]))))
+	return shapes, data
 }

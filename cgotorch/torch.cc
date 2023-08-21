@@ -1,5 +1,5 @@
 // Copyright 2020, GoTorch Authors
-#include "cgotorch/torch.h"
+#include "torch.h"
 
 #include <vector>
 
@@ -241,6 +241,15 @@ const char *Add_(Tensor a, Tensor other, float alpha, Tensor *result) {
   }
 }
 
+const char *Add_Scalar(Tensor a, float b, float alpha, Tensor *result) {
+  try {
+    *result = new at::Tensor(torch::add(*a, b, alpha));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
 const char *Sub(Tensor a, Tensor other, float alpha, Tensor *result) {
   try {
     *result = new at::Tensor(torch::sub(*a, *other, alpha));
@@ -253,6 +262,15 @@ const char *Sub(Tensor a, Tensor other, float alpha, Tensor *result) {
 const char *Sub_(Tensor a, Tensor other, float alpha, Tensor *result) {
   try {
     *result = new at::Tensor(a->sub_(*other, alpha));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Sub_Scalar(Tensor a, float b, float alpha, Tensor *result) {
+  try {
+    *result = new at::Tensor(torch::sub(*a, b, alpha));
     return nullptr;
   } catch (const std::exception &e) {
     return exception_str(e.what());
@@ -382,6 +400,15 @@ const char *View(Tensor a, Tensor *result, int64_t *size, int64_t size_len) {
   }
 }
 
+const char *Softmax(Tensor a, int64_t dim, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->softmax(dim));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
 const char *LogSoftmax(Tensor a, int64_t dim, Tensor *result) {
   try {
     *result = new at::Tensor(a->log_softmax(dim));
@@ -433,6 +460,20 @@ const char *Argmax(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result) {
     } else {
       *result = new at::Tensor(a->argmax(*dim, static_cast<bool>(keepdim)));
     }
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Cat(Tensor *tensors, int64_t tensors_len, int64_t dim,
+                Tensor *result) {
+  try {
+    std::vector<at::Tensor> ts;
+    for (int64_t i = 0; i < tensors_len; i++) {
+      ts.push_back(*tensors[i]);
+    }
+    *result = new at::Tensor(torch::cat(ts, dim));
     return nullptr;
   } catch (const std::exception &e) {
     return exception_str(e.what());
