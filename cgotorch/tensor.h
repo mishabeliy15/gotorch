@@ -40,6 +40,7 @@ const char *Tensor_Slice(Tensor input, int64_t dim, int64_t start, int64_t end,
 const char *Tensor_Norm(Tensor input, int64_t p, int64_t dim, Tensor *result);
 const char *Tensor_Unsqueeze(Tensor input, int64_t dim, Tensor *result);
 const char *Tensor_GeScalar(Tensor input, float other, Tensor *result);
+const char *Tensor_LessScalar(Tensor input, float other, Tensor *result);
 const char *Tensor_NonZero(Tensor input, Tensor *result);
 const char *Tensor_Zeros(int8_t dtype, int64_t *sizes_data,
                          int64_t sizes_data_len, Tensor *result);
@@ -47,6 +48,7 @@ const char *Tensor_Ones_Like(Tensor input, Tensor *result);
 const char *Tensor_IndexPut(Tensor input, int64_t index, Tensor source);
 const char *Tensor_IndexByTensors(Tensor input, Tensor *indexes, int64_t index_len, Tensor *result);
 const char *Tensor_Device(Tensor input, Device *device);
+const char *Tensor_Index_fill(Tensor input, int64_t dim, Tensor index, float value);
 ////////////////////////////////////////////////////////////////////////////////
 // Backward, Gradient
 ////////////////////////////////////////////////////////////////////////////////

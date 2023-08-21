@@ -311,6 +311,15 @@ const char *Tensor_GeScalar(Tensor input, float other, Tensor *result) {
   }
 }
 
+const char *Tensor_LessScalar(Tensor input, float other, Tensor *result) {
+    try {
+        *result = new at::Tensor(input->less(other));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
 const char *Tensor_NonZero(Tensor input, Tensor *result) {
   try {
     *result = new at::Tensor(input->nonzero());
@@ -366,6 +375,15 @@ const char *Tensor_IndexByTensors(Tensor input, Tensor *indexes, int64_t index_l
 const char *Tensor_Device(Tensor input, Device *device) {
   try {
     *device = new at::Device(input->device());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Index_fill(Tensor input, int64_t dim, Tensor index, float value) {
+  try {
+    input->index_fill(dim, *index, value);
     return nullptr;
   } catch (const std::exception &e) {
     return exception_str(e.what());

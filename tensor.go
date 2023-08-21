@@ -308,6 +308,17 @@ func (a Tensor) GeScalar(b float32) Tensor {
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
 
+// LessScalar calls Tensor::less to return a tensor with less than the given scalar
+func (a Tensor) LessScalar(b float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_LessScalar(
+		C.Tensor(*a.T),
+		C.float(b),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
 // NonZero calls Tensor::nonzero to return a tensor with the indices of all non-zero elements
 func (a Tensor) NonZero() Tensor {
 	var t C.Tensor
@@ -365,8 +376,22 @@ func (a Tensor) IndexByTensors(indexes []Tensor) Tensor {
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
 
+// Device calls Tensor::device to return the device of a tensor
 func (a Tensor) Device() Device {
 	var d C.Device
 	MustNil(unsafe.Pointer(C.Tensor_Device(C.Tensor(*a.T), &d)))
 	return Device{d}
+}
+
+// TensorIndexFill calls Tensor::index_fill to fill the tensor with value by the given index
+func (a Tensor) TensorIndexFill(dim int64, index Tensor, value float32) {
+	MustNil(unsafe.Pointer(C.Tensor_Index_fill(C.Tensor(*a.T), C.int64_t(dim), C.Tensor(*index.T), C.float(value))))
+}
+
+// Log calls Tensor::log to return a tensor with the natural logarithm of the elements
+func (a Tensor) Log() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Log(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
 }

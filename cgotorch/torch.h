@@ -69,6 +69,7 @@ const char *IndexSelect(Tensor a, int64_t dim, Tensor index, Tensor *result);
 const char *View(Tensor a, Tensor *result, int64_t *size, int64_t size_len);
 const char *Softmax(Tensor a, int64_t dim, Tensor *result);
 const char *LogSoftmax(Tensor a, int64_t dim, Tensor *result);
+const char *Log(Tensor a, Tensor *result);
 const char *Squeeze(Tensor a, Tensor *result);
 const char *SqueezeWithDim(Tensor a, int64_t dim, Tensor *result);
 const char *Argmin(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result);
