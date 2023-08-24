@@ -546,3 +546,21 @@ const char *FreeTensorArray(Tensor *tensors) {
         return exception_str(e.what());
     }
 }
+
+const char *Pow(Tensor a, int64_t b, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->pow(b));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *FloatPower(Tensor a, float b, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->float_power(b));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}

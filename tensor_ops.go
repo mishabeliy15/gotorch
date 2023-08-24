@@ -622,3 +622,29 @@ func MeshGrid(tensors []Tensor) []Tensor {
 	cTensors := unsafe.Slice(t, int64(cLength))
 	return tensorListToSlice(cTensors, cLength)
 }
+
+// Pow mimics torch.pow
+func (a Tensor) Pow(exponent int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Pow(C.Tensor(*a.T), C.int64_t(exponent), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Pow mimics torch.pow
+func Pow(a Tensor, exponent int64) Tensor {
+	return a.Pow(exponent)
+}
+
+// FloatPower mimics torch.pow
+func (a Tensor) FloatPower(exponent float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.FloatPower(C.Tensor(*a.T), C.float(exponent), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// FloatPower mimics torch.pow
+func FloatPower(a Tensor, exponent float32) Tensor {
+	return a.FloatPower(exponent)
+}

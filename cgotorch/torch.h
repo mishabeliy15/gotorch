@@ -85,6 +85,8 @@ const char *Min(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tenso
 const char *Exp(Tensor a, Tensor *result);
 const char *MeshGrid(Tensor *tensors, int64_t tensors_len, Tensor **results, int64_t *results_len);
 const char *FreeTensorArray(Tensor *tensors);
+const char *Pow(Tensor a, int64_t b, Tensor *result);
+const char *FloatPower(Tensor a, float b, Tensor *result);
 #ifdef __cplusplus
 }
 #endif
