@@ -228,7 +228,7 @@ const char *Tensor_Split(Tensor input, int64_t split_size, int64_t dim,
   try {
       auto split = input->split(split_size, dim);
       *results_len = split.size();
-      for (int i = 0; i < *results_len; i++) {
+      for (int64_t i = 0; i < *results_len; i++) {
         results[i] = new at::Tensor(split[i]);
       }
     return nullptr;

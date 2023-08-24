@@ -488,3 +488,61 @@ const char *Cat(Tensor *tensors, int64_t tensors_len, int64_t dim,
     return exception_str(e.what());
   }
 }
+
+const char *Max(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices) {
+    try {
+        auto outputs = torch::max(*a, dim, keepDim);
+        *resultValues = new at::Tensor(std::get<0>(outputs));
+        *resultIndices = new at::Tensor(std::get<1>(outputs));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Min(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices) {
+    try {
+        auto outputs = torch::min(*a, dim, keepDim);
+        *resultValues = new at::Tensor(std::get<0>(outputs));
+        *resultIndices = new at::Tensor(std::get<1>(outputs));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Exp(Tensor a, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->exp());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *MeshGrid(Tensor *tensors, int64_t tensors_len, Tensor **results, int64_t *results_len) {
+  try {
+    std::vector<at::Tensor> ts;
+    for (int64_t i = 0; i < tensors_len; i++) {
+      ts.push_back(*tensors[i]);
+    }
+    auto res = torch::meshgrid(ts);
+    *results_len = res.size();
+    *results = (Tensor*)new Tensor[*results_len];
+    for (int64_t i = 0; i < *results_len; i++) {
+      (*results)[i] = new at::Tensor(res[i]);
+    }
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *FreeTensorArray(Tensor *tensors) {
+    try {
+        delete[] tensors;
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}

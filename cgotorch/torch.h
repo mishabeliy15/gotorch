@@ -80,6 +80,11 @@ const char *Stack(Tensor *tensors, int64_t tensors_size, int64_t dim,
                   Tensor *result);
 const char *Cat(Tensor *tensors, int64_t tensors_len, int64_t dim,
                 Tensor *result);
+const char *Max(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices);
+const char *Min(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices);
+const char *Exp(Tensor a, Tensor *result);
+const char *MeshGrid(Tensor *tensors, int64_t tensors_len, Tensor **results, int64_t *results_len);
+const char *FreeTensorArray(Tensor *tensors);
 #ifdef __cplusplus
 }
 #endif
