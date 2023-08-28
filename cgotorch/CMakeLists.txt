@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Check for CUDA if necessary
 find_package(CUDA QUIET)
 if(CUDA_FOUND)
+  enable_language(CUDA)
   add_definitions(-DUSE_CUDA)
   set(CUDA_FLAGS ${CUDA_LIBRARIES})
 endif()

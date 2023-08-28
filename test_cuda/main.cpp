@@ -4,8 +4,8 @@
 
 int main() {
     std::cout << "Is Cuda Available: " << torch::cuda::is_available() << std::endl;
-    auto device = torch::cuda::is_available() ? torch::kCUDA : torch::kCPU;
-    torch::Tensor tensor = torch::rand({2, 3}, device=device);
+    torch::Tensor tensor = torch::rand({2, 3});
+    tensor = tensor.to(torch::kCUDA);
     std::cout << tensor << std::endl;
     return 0;
 }
