@@ -2,9 +2,13 @@
 #include <iostream>
 
 
-const char* loadModule(const char *modelPath, Module *result) {
+const char* loadModule(const char *modelPath, Device device, Module *result) {
     try {
-        *result = new torch::jit::script::Module(torch::jit::load(modelPath));
+        if (device != nullptr) {
+            *result = new torch::jit::script::Module(torch::jit::load(modelPath, c10::optional<c10::Device>(*device)));
+        } else {
+            *result = new torch::jit::script::Module(torch::jit::load(modelPath));
+        }
         return nullptr;
       } catch (const std::exception &e) {
         return exception_str(e.what());
@@ -22,3 +26,12 @@ const char* forwardModule(Module module, Tensor input, IValue *output) {
 }
 
 void Module_Close(Module a) { delete a; }
+
+const char* Module_ToDevice(Module module, Device device) {
+    try {
+        module->to(*device);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}

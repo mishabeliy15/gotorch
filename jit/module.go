@@ -16,11 +16,17 @@ type Module struct {
 }
 
 // LoadJITModule loads a model from a *.pt file
-func LoadJITModule(modelPath string) *Module {
+func LoadJITModule(modelPath string, device *torch.Device) *Module {
 	var c C.Module
-	torch.MustNil(unsafe.Pointer(
-		C.loadModule(C.CString(modelPath), &c),
-	))
+	if device == nil {
+		torch.MustNil(unsafe.Pointer(
+			C.loadModule(C.CString(modelPath), nil, &c),
+		))
+	} else {
+		torch.MustNil(unsafe.Pointer(
+			C.loadModule(C.CString(modelPath), C.Device(device.T), &c),
+		))
+	}
 	SetModuleFinalizer((*unsafe.Pointer)(&c))
 	return &Module{M: (*unsafe.Pointer)(&c)}
 }
@@ -33,4 +39,8 @@ func (m *Module) Forward(input torch.Tensor) *IValue {
 	))
 	SetIValueFinalizer((*unsafe.Pointer)(&c))
 	return &IValue{I: (*unsafe.Pointer)(&c)}
+}
+
+func (m *Module) To(device torch.Device) {
+	C.Module_ToDevice((C.Module)(*m.M), C.Device(device.T))
 }

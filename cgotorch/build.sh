@@ -20,7 +20,6 @@ if [ "$OS" == "Darwin" ]; then
     cp -f *.dylib "$BASE_DIR"
 else
     cp -f *.so "$BASE_DIR"
-    exit 1
 fi
 
 rm -rf "$BUILD_DIR"
