@@ -42,5 +42,13 @@ func (m *Module) Forward(input torch.Tensor) *IValue {
 }
 
 func (m *Module) To(device torch.Device) {
-	C.Module_ToDevice((C.Module)(*m.M), C.Device(device.T))
+	torch.MustNil(unsafe.Pointer(C.Module_ToDevice((C.Module)(*m.M), C.Device(device.T))))
+}
+
+func (m *Module) Train(train bool) {
+	torch.MustNil(unsafe.Pointer(C.Module_Train((C.Module)(*m.M), C.bool(train))))
+}
+
+func (m *Module) Eval() {
+	torch.MustNil(unsafe.Pointer(C.Module_Eval((C.Module)(*m.M))))
 }

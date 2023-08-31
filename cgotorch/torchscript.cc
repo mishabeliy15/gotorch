@@ -35,3 +35,21 @@ const char* Module_ToDevice(Module module, Device device) {
         return exception_str(e.what());
     }
 }
+
+const char* Module_Train(Module module, bool train) {
+    try {
+        module->train(train);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char* Module_Eval(Module module) {
+    try {
+        module->eval();
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
