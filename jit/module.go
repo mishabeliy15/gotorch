@@ -45,14 +45,23 @@ func (m *Module) Forward(input torch.Tensor) *IValue {
 	return &IValue{I: (*unsafe.Pointer)(&c)}
 }
 
+// To move the model to a device
 func (m *Module) To(device torch.Device) {
 	torch.MustNil(unsafe.Pointer(C.Module_ToDevice((C.Module)(*m.M), C.Device(device.T))))
 }
 
+// Train sets the model to train mode
 func (m *Module) Train(train bool) {
 	torch.MustNil(unsafe.Pointer(C.Module_Train((C.Module)(*m.M), C.bool(train))))
 }
 
+// Eval sets the model to eval mode
 func (m *Module) Eval() {
 	torch.MustNil(unsafe.Pointer(C.Module_Eval((C.Module)(*m.M))))
+}
+
+// Free frees the model in C++
+func (m *Module) Free() {
+	C.Module_Close(C.Module(*m.M))
+	m.M = nil
 }
