@@ -50,3 +50,9 @@ func (i *IValue) ToTensor() torch.Tensor {
 	))
 	return torch.Tensor{T: (*unsafe.Pointer)(&c)}
 }
+
+// Free frees the IValue in C++
+func (i *IValue) Free() {
+	C.IValue_Close(C.IValue(*i.I))
+	i.I = nil
+}
