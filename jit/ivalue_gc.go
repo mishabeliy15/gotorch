@@ -13,6 +13,8 @@ import (
 // SetIValueFinalizer sets a finalizer to the IValue
 func SetIValueFinalizer(t *unsafe.Pointer) {
 	runtime.SetFinalizer(t, func(ct *unsafe.Pointer) {
-		C.IValue_Close(C.IValue(*ct))
+		if ct != nil {
+			C.IValue_Close(C.IValue(*ct))
+		}
 	})
 }
