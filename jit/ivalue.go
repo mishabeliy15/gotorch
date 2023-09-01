@@ -53,6 +53,8 @@ func (i *IValue) ToTensor() torch.Tensor {
 
 // Free frees the IValue in C++
 func (i *IValue) Free() {
-	C.IValue_Close(C.IValue(*i.I))
-	i.I = nil
+	if i.I != nil {
+		C.IValue_Close(C.IValue(*i.I))
+		i.I = nil
+	}
 }

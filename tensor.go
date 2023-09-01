@@ -395,3 +395,11 @@ func (a Tensor) Log() Tensor {
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
+
+// Free frees the tensor in C++
+func (a Tensor) Free() {
+	if a.T != nil {
+		C.Tensor_Close(C.Tensor(*a.T))
+		a.T = nil
+	}
+}

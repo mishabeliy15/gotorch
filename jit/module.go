@@ -7,9 +7,7 @@ package jit
 import "C"
 
 import (
-	"fmt"
 	torch "github.com/wangkuiyi/gotorch"
-	"time"
 	"unsafe"
 )
 
@@ -39,9 +37,7 @@ func (m *Module) Forward(input torch.Tensor) *IValue {
 	torch.MustNil(unsafe.Pointer(
 		C.forwardModule((C.Module)(*m.M), (C.Tensor)(*input.T), &c),
 	))
-	fmt.Printf("[%v] Begin SetIValueFinalizer\n", time.Now().UTC())
 	SetIValueFinalizer((*unsafe.Pointer)(&c))
-	fmt.Printf("[%v] End SetIValueFinalizer\n", time.Now().UTC())
 	return &IValue{I: (*unsafe.Pointer)(&c)}
 }
 
@@ -62,6 +58,8 @@ func (m *Module) Eval() {
 
 // Free frees the model in C++
 func (m *Module) Free() {
-	C.Module_Close(C.Module(*m.M))
-	m.M = nil
+	if m.M != nil {
+		C.Module_Close(C.Module(*m.M))
+		m.M = nil
+	}
 }
