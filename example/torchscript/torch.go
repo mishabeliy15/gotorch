@@ -8,35 +8,33 @@ import (
 )
 
 func testModel() {
-	fmt.Printf("[%v] Loading model\n", time.Now().UTC())
-	model := jit.LoadJITModule("model.pt", nil)
-	fmt.Printf("[%v] Model loaded successfully!\n", time.Now().UTC())
-	inputTensor := torch.RandN([]int64{1, 1, 240, 320}, false)
-	fmt.Printf("[%v] Input tensor created successfully!", time.Now().UTC())
-	res := model.Forward(inputTensor)
-	fmt.Printf("[%v] res is tuple: %v\n", time.Now().UTC(), res.IsTuple())
-	tuple := res.ToTuple()
-	for i, t := range tuple {
-		fmt.Printf("[%v] tuple[%d] is tensor: %v\n", time.Now().UTC(), i, t.IsTensor())
-		tensor := t.ToTensor().To(torch.NewDevice("cpu"), torch.Float)
-		shapes, sl := tensor.ToFloat32Slice()
-		fmt.Printf("[%v] tensor shape: %v\nTensor len: %v\n", time.Now().UTC(), shapes, len(sl))
-	}
+	cuda := torch.IsCUDAAvailable()
+	fmt.Printf("CUDA Available: %v\n", cuda)
 	var device torch.Device
-	cudaAvailable := torch.IsCUDAAvailable()
-	fmt.Printf("[%v] CUDA Available: %v\n", time.Now().UTC(), cudaAvailable)
-	if cudaAvailable {
+	if cuda {
 		device = torch.NewDevice("cuda")
 	} else {
 		device = torch.NewDevice("cpu")
 	}
-	fmt.Printf("[%v] Moving model to device: %v\n", time.Now().UTC(), device)
-	model.To(device)
-	fmt.Printf("[%v] Moving input tensor to device: %v\n", time.Now().UTC(), device)
-	inputTensor = inputTensor.To(device)
-	fmt.Printf("[%v] Run forward pass\n", time.Now().UTC())
-	res = model.Forward(inputTensor)
-	fmt.Printf("[%v] res is tuple: %v\n", time.Now().UTC(), res.IsTuple())
+	fmt.Printf("[%v] Loading model\n", time.Now().UTC())
+	model := jit.LoadJITModule("model.pt", &device)
+	fmt.Printf("[%v] Change to eval mode", time.Now().UTC())
+	model.Eval()
+	fmt.Printf("[%v] Creatting tensor\n", time.Now().UTC())
+	inputTensor := torch.RandN([]int64{1, 1, 240, 320}, false).To(device)
+	fmt.Printf("[%v] Input tensor created successfully! Warm upping...\n", time.Now().UTC())
+	model.Forward(inputTensor)
+	fmt.Printf("[%v] Warm upped!\n", time.Now().UTC())
+	sumDuration := 0.0
+	count := 20
+	for i := 0; i < count; i++ {
+		startTime := time.Now()
+		model.Forward(inputTensor)
+		duration := time.Now().Sub(startTime).Seconds()
+		fmt.Printf("[%v] Forward pass time %d: %.5f\n", time.Now().UTC(), i+1, duration)
+		sumDuration += duration
+	}
+	fmt.Printf("Average time: %.5f\n", sumDuration/float64(count))
 }
 
 func main() {
