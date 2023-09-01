@@ -37,7 +37,7 @@ func (m *Module) Forward(input torch.Tensor) *IValue {
 	torch.MustNil(unsafe.Pointer(
 		C.forwardModule((C.Module)(*m.M), (C.Tensor)(*input.T), &c),
 	))
-	//SetIValueFinalizer((*unsafe.Pointer)(&c)) # ToDo: uncomment and fix performance issue
+	SetIValueFinalizer((*unsafe.Pointer)(&c))
 	return &IValue{I: (*unsafe.Pointer)(&c)}
 }
 

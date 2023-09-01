@@ -4,6 +4,7 @@ import (
 	"fmt"
 	torch "github.com/wangkuiyi/gotorch"
 	"github.com/wangkuiyi/gotorch/jit"
+	"runtime"
 	"time"
 )
 
@@ -29,11 +30,11 @@ func testModel() {
 	count := 20
 	for i := 0; i < count; i++ {
 		startTime := time.Now()
-		res := model.Forward(inputTensor)
+		model.Forward(inputTensor)
 		duration := time.Now().Sub(startTime).Seconds()
 		fmt.Printf("[%v] Forward pass time %d: %.5f\n", time.Now().UTC(), i+1, duration)
 		sumDuration += duration
-		res.Free()
+		runtime.GC()
 		fmt.Printf("[%v] Freed IValue %d\n", time.Now().UTC(), i+1)
 	}
 	fmt.Printf("Average time: %.5f\n", sumDuration/float64(count))
