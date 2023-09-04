@@ -403,3 +403,10 @@ func (a Tensor) Free() {
 		a.T = nil
 	}
 }
+
+func (a Tensor) Contiguous() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_Contiguous(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}

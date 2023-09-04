@@ -49,6 +49,7 @@ const char *Tensor_IndexPut(Tensor input, int64_t index, Tensor source);
 const char *Tensor_IndexByTensors(Tensor input, Tensor *indexes, int64_t index_len, Tensor *result);
 const char *Tensor_Device(Tensor input, Device *device);
 const char *Tensor_Index_fill(Tensor input, int64_t dim, Tensor index, float value);
+const char *Tensor_Contiguous(Tensor input, Tensor *result);
 ////////////////////////////////////////////////////////////////////////////////
 // Backward, Gradient
 ////////////////////////////////////////////////////////////////////////////////

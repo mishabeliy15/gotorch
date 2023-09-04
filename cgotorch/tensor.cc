@@ -389,3 +389,12 @@ const char *Tensor_Index_fill(Tensor input, int64_t dim, Tensor index, float val
     return exception_str(e.what());
   }
 }
+
+const char *Tensor_Contiguous(Tensor input, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->contiguous());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
