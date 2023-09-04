@@ -100,9 +100,22 @@ func Mul(a, other Tensor) Tensor {
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
 
-// Mul torch.Mul
+// Mul torch.mul
 func (a *Tensor) Mul(other Tensor) Tensor {
 	return Mul(*a, other)
+}
+
+// MulScalar torch.mul
+func MulScalar(a Tensor, other float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.MulScalar(C.Tensor(*a.T), C.float(other), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// MulScalar torch.mul
+func (a *Tensor) MulScalar(other float32) Tensor {
+	return MulScalar(*a, other)
 }
 
 // MulI multiplies in-place
@@ -127,6 +140,19 @@ func Div(a, other Tensor) Tensor {
 // Div torch.Div
 func (a *Tensor) Div(other Tensor) Tensor {
 	return Div(*a, other)
+}
+
+// DivScalar torch.div
+func DivScalar(a Tensor, other float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.DivScalar(C.Tensor(*a.T), C.float(other), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// DivScalar torch.div
+func (a *Tensor) DivScalar(other float32) Tensor {
+	return DivScalar(*a, other)
 }
 
 // DivI run divides in-place

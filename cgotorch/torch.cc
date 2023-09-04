@@ -295,6 +295,15 @@ const char *Mul_(Tensor a, Tensor other, Tensor *result) {
   }
 }
 
+const char *MulScalar(Tensor a, float other, Tensor *result) {
+  try {
+    *result = new at::Tensor(torch::mul(*a, other));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
 const char *Div(Tensor a, Tensor other, Tensor *result) {
   try {
     *result = new at::Tensor(torch::div(*a, *other));
@@ -311,6 +320,15 @@ const char *Div_(Tensor a, Tensor other, Tensor *result) {
   } catch (const std::exception &e) {
     return exception_str(e.what());
   }
+}
+
+const char *DivScalar(Tensor a, float other, Tensor *result) {
+    try {
+        *result = new at::Tensor(torch::div(*a, other));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
 }
 
 const char *Permute(Tensor a, int64_t *dims, int64_t dims_size,
