@@ -70,6 +70,7 @@ const char *Tensor_Index(Tensor a, int64_t *index, int64_t index_len,
 const char *Tensor_ToArray(Tensor input, void *result);
 const char *Tensor_Select(Tensor input, int64_t dim, int64_t index,
                           Tensor *result);
+const char *Tensor_MaskedSelect(Tensor input, Tensor mask, Tensor *result);
 
 #ifdef __cplusplus
 }

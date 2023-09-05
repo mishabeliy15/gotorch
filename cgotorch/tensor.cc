@@ -398,3 +398,12 @@ const char *Tensor_Contiguous(Tensor input, Tensor *result) {
     return exception_str(e.what());
   }
 }
+
+const char *Tensor_MaskedSelect(Tensor input, Tensor mask, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->masked_select(*mask));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
