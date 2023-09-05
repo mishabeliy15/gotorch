@@ -404,9 +404,18 @@ func (a Tensor) Free() {
 	}
 }
 
+// Contiguous calls Tensor::contiguous to return a contiguous tensor
 func (a Tensor) Contiguous() Tensor {
 	var t C.Tensor
 	MustNil(unsafe.Pointer(C.Tensor_Contiguous(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// MaskedSelect calls Tensor::masked_select to return a tensor with the elements of input tensor
+func (a Tensor) MaskedSelect(mask Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Tensor_MaskedSelect(C.Tensor(*a.T), C.Tensor(*mask.T), &t)))
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
