@@ -1,6 +1,6 @@
 module github.com/wangkuiyi/gotorch
 
-go 1.13
+go 1.19
 
 require (
 	github.com/stretchr/testify v1.6.1

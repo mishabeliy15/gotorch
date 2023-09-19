@@ -100,9 +100,22 @@ func Mul(a, other Tensor) Tensor {
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
 
-// Mul torch.Mul
+// Mul torch.mul
 func (a *Tensor) Mul(other Tensor) Tensor {
 	return Mul(*a, other)
+}
+
+// MulScalar torch.mul
+func MulScalar(a Tensor, other float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.MulScalar(C.Tensor(*a.T), C.float(other), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// MulScalar torch.mul
+func (a *Tensor) MulScalar(other float32) Tensor {
+	return MulScalar(*a, other)
 }
 
 // MulI multiplies in-place
@@ -127,6 +140,19 @@ func Div(a, other Tensor) Tensor {
 // Div torch.Div
 func (a *Tensor) Div(other Tensor) Tensor {
 	return Div(*a, other)
+}
+
+// DivScalar torch.div
+func DivScalar(a Tensor, other float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.DivScalar(C.Tensor(*a.T), C.float(other), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// DivScalar torch.div
+func (a *Tensor) DivScalar(other float32) Tensor {
+	return DivScalar(*a, other)
 }
 
 // DivI run divides in-place
@@ -565,4 +591,86 @@ func (a Tensor) ToInt64Slice() (shapes []int64, data []int64) {
 	data = make([]int64, length)
 	MustNil(unsafe.Pointer(C.Tensor_ToArray(C.Tensor(*a.T), unsafe.Pointer(&data[0]))))
 	return shapes, data
+}
+
+// Max mimics torch.max
+func (a Tensor) Max(dim int64, keepDim bool) (values Tensor, indices Tensor) {
+	var tV, tI C.Tensor
+	MustNil(unsafe.Pointer(C.Max(C.Tensor(*a.T), C.int64_t(dim), C.bool(keepDim), &tV, &tI)))
+	SetTensorFinalizer((*unsafe.Pointer)(&tV))
+	SetTensorFinalizer((*unsafe.Pointer)(&tI))
+	return Tensor{(*unsafe.Pointer)(&tV)}, Tensor{(*unsafe.Pointer)(&tI)}
+}
+
+// Max mimics torch.max
+func Max(a Tensor, dim int64, keepDim bool) (values Tensor, indices Tensor) {
+	return a.Max(dim, keepDim)
+}
+
+// Min mimics torch.min
+func (a Tensor) Min(dim int64, keepDim bool) (values Tensor, indices Tensor) {
+	var tV, tI C.Tensor
+	MustNil(unsafe.Pointer(C.Min(C.Tensor(*a.T), C.int64_t(dim), C.bool(keepDim), &tV, &tI)))
+	SetTensorFinalizer((*unsafe.Pointer)(&tV))
+	SetTensorFinalizer((*unsafe.Pointer)(&tI))
+	return Tensor{(*unsafe.Pointer)(&tV)}, Tensor{(*unsafe.Pointer)(&tI)}
+}
+
+// Min mimics torch.min
+func Min(a Tensor, dim int64, keepDim bool) (values Tensor, indices Tensor) {
+	return a.Min(dim, keepDim)
+}
+
+// Exp mimics torch.exp
+func (a Tensor) Exp() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Exp(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Exp mimics torch.exp
+func Exp(a Tensor) Tensor {
+	return a.Exp()
+}
+
+// MeshGrid mimics torch.meshgrid
+func MeshGrid(tensors []Tensor) []Tensor {
+	CT := make([]C.Tensor, 0, len(tensors))
+	for _, t := range tensors {
+		CT = append(CT, C.Tensor(*t.T))
+	}
+	p := (*C.Tensor)(unsafe.Pointer(&CT[0]))
+	var t *C.Tensor
+	var cLength C.int64_t
+	MustNil(unsafe.Pointer(C.MeshGrid(p, C.int64_t(len(CT)), &t, &cLength)))
+	defer C.FreeTensorArray(t)
+	cTensors := unsafe.Slice(t, int64(cLength))
+	return tensorListToSlice(cTensors, cLength)
+}
+
+// Pow mimics torch.pow
+func (a Tensor) Pow(exponent int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Pow(C.Tensor(*a.T), C.int64_t(exponent), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Pow mimics torch.pow
+func Pow(a Tensor, exponent int64) Tensor {
+	return a.Pow(exponent)
+}
+
+// FloatPower mimics torch.pow
+func (a Tensor) FloatPower(exponent float32) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.FloatPower(C.Tensor(*a.T), C.float(exponent), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// FloatPower mimics torch.pow
+func FloatPower(a Tensor, exponent float32) Tensor {
+	return a.FloatPower(exponent)
 }

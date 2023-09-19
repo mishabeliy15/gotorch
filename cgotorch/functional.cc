@@ -207,3 +207,36 @@ const char *AdaptiveAvgPool2d(Tensor input, int64_t *output_size_data,
     return exception_str(e.what());
   }
 }
+
+const char *GridSample(Tensor input, Tensor grid, const char *mode,
+                       const char *padding_mode, bool align_corners,
+                       Tensor *result) {
+  try {
+    auto options = torch::nn::functional::GridSampleFuncOptions().align_corners(align_corners);
+    if (mode != nullptr) {
+      if (strcmp(mode, "bilinear") == 0) {
+          options.mode(torch::kBilinear);
+      } else if (strcmp(mode, "nearest") == 0) {
+          options.mode(torch::kNearest);
+      } else {
+          return exception_str("Invalid mode, support only: bilinear, nearest");
+      }
+    }
+    if (padding_mode != nullptr) {
+      if (strcmp(padding_mode, "zeros") == 0) {
+          options.padding_mode(torch::kZeros);
+      } else if (strcmp(padding_mode, "border") == 0) {
+          options.padding_mode(torch::kBorder);
+      } else if (strcmp(padding_mode, "reflection") == 0) {
+          options.padding_mode(torch::kReflection);
+      } else {
+          return exception_str("Invalid padding_mode, support only: zeros, border, reflection");
+      }
+    }
+    auto out = torch::nn::functional::grid_sample(*input, *grid, options);
+    *result = new at::Tensor(out);
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}

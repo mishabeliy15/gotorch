@@ -55,8 +55,10 @@ const char *Sub_(Tensor a, Tensor other, float alpha, Tensor *result);
 const char *Sub_Scalar(Tensor a, float b, float alpha, Tensor *result);
 const char *Mul(Tensor a, Tensor other, Tensor *result);
 const char *Mul_(Tensor a, Tensor other, Tensor *result);
+const char *MulScalar(Tensor a, float other, Tensor *result);
 const char *Div(Tensor a, Tensor other, Tensor *result);
 const char *Div_(Tensor a, Tensor other, Tensor *result);
+const char *DivScalar(Tensor a, float other, Tensor *result);
 const char *Permute(Tensor a, int64_t *dims, int64_t dims_size, Tensor *result);
 const char *AllClose(Tensor a, Tensor b, int64_t *result);
 const char *Flatten(Tensor a, int64_t startDim, int64_t endDim, Tensor *result);
@@ -69,6 +71,7 @@ const char *IndexSelect(Tensor a, int64_t dim, Tensor index, Tensor *result);
 const char *View(Tensor a, Tensor *result, int64_t *size, int64_t size_len);
 const char *Softmax(Tensor a, int64_t dim, Tensor *result);
 const char *LogSoftmax(Tensor a, int64_t dim, Tensor *result);
+const char *Log(Tensor a, Tensor *result);
 const char *Squeeze(Tensor a, Tensor *result);
 const char *SqueezeWithDim(Tensor a, int64_t dim, Tensor *result);
 const char *Argmin(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result);
@@ -79,6 +82,13 @@ const char *Stack(Tensor *tensors, int64_t tensors_size, int64_t dim,
                   Tensor *result);
 const char *Cat(Tensor *tensors, int64_t tensors_len, int64_t dim,
                 Tensor *result);
+const char *Max(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices);
+const char *Min(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices);
+const char *Exp(Tensor a, Tensor *result);
+const char *MeshGrid(Tensor *tensors, int64_t tensors_len, Tensor **results, int64_t *results_len);
+const char *FreeTensorArray(Tensor *tensors);
+const char *Pow(Tensor a, int64_t b, Tensor *result);
+const char *FloatPower(Tensor a, float b, Tensor *result);
 #ifdef __cplusplus
 }
 #endif

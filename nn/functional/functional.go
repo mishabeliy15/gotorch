@@ -13,6 +13,21 @@ import (
 	torch "github.com/wangkuiyi/gotorch"
 )
 
+type InterpolationMode string
+
+const (
+	Bilinear InterpolationMode = "bilinear"
+	Nearest  InterpolationMode = "nearest"
+)
+
+type PaddingMode string
+
+const (
+	Zeros      PaddingMode = "zeros"
+	Beros      PaddingMode = "border"
+	Reflection PaddingMode = "reflection"
+)
+
 // BatchNorm does batch nomalization for `input`
 func BatchNorm(input, runningMean, runningVar, weight, bias torch.Tensor,
 	training bool, momentum, eps float64) torch.Tensor {
@@ -241,6 +256,28 @@ func AdaptiveAvgPool2d(input torch.Tensor, outputSize []int64) torch.Tensor {
 		(*C.int64_t)(unsafe.Pointer(&outputSize[0])), C.int64_t(len(outputSize)),
 		&t)))
 	runtime.KeepAlive(input.T)
+	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return torch.Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// GridSample torch.nn.functional.grid_sample
+func GridSample(input, grid torch.Tensor, mode *InterpolationMode, paddingMode *PaddingMode,
+	alignCorners bool) torch.Tensor {
+	var t C.Tensor
+	var cMode, cPaddingMode *C.char
+	if mode != nil {
+		cMode = C.CString(string(*mode))
+	}
+	if paddingMode != nil {
+		cPaddingMode = C.CString(string(*paddingMode))
+	}
+	torch.MustNil(unsafe.Pointer(C.GridSample(
+		C.Tensor(*input.T),
+		C.Tensor(*grid.T),
+		cMode,
+		cPaddingMode,
+		C.bool(alignCorners),
+		&t)))
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return torch.Tensor{(*unsafe.Pointer)(&t)}
 }

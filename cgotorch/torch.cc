@@ -295,6 +295,15 @@ const char *Mul_(Tensor a, Tensor other, Tensor *result) {
   }
 }
 
+const char *MulScalar(Tensor a, float other, Tensor *result) {
+  try {
+    *result = new at::Tensor(torch::mul(*a, other));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
 const char *Div(Tensor a, Tensor other, Tensor *result) {
   try {
     *result = new at::Tensor(torch::div(*a, *other));
@@ -311,6 +320,15 @@ const char *Div_(Tensor a, Tensor other, Tensor *result) {
   } catch (const std::exception &e) {
     return exception_str(e.what());
   }
+}
+
+const char *DivScalar(Tensor a, float other, Tensor *result) {
+    try {
+        *result = new at::Tensor(torch::div(*a, other));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
 }
 
 const char *Permute(Tensor a, int64_t *dims, int64_t dims_size,
@@ -418,6 +436,15 @@ const char *LogSoftmax(Tensor a, int64_t dim, Tensor *result) {
   }
 }
 
+const char *Log(Tensor a, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->log());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
 const char *Squeeze(Tensor a, Tensor *result) {
   try {
     *result = new at::Tensor(a->squeeze());
@@ -474,6 +501,82 @@ const char *Cat(Tensor *tensors, int64_t tensors_len, int64_t dim,
       ts.push_back(*tensors[i]);
     }
     *result = new at::Tensor(torch::cat(ts, dim));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Max(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices) {
+    try {
+        auto outputs = torch::max(*a, dim, keepDim);
+        *resultValues = new at::Tensor(std::get<0>(outputs));
+        *resultIndices = new at::Tensor(std::get<1>(outputs));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Min(Tensor a, int64_t dim, bool keepDim, Tensor *resultValues, Tensor *resultIndices) {
+    try {
+        auto outputs = torch::min(*a, dim, keepDim);
+        *resultValues = new at::Tensor(std::get<0>(outputs));
+        *resultIndices = new at::Tensor(std::get<1>(outputs));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Exp(Tensor a, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->exp());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *MeshGrid(Tensor *tensors, int64_t tensors_len, Tensor **results, int64_t *results_len) {
+  try {
+    std::vector<at::Tensor> ts;
+    for (int64_t i = 0; i < tensors_len; i++) {
+      ts.push_back(*tensors[i]);
+    }
+    auto res = torch::meshgrid(ts);
+    *results_len = res.size();
+    *results = (Tensor*)new Tensor[*results_len];
+    for (int64_t i = 0; i < *results_len; i++) {
+      (*results)[i] = new at::Tensor(res[i]);
+    }
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *FreeTensorArray(Tensor *tensors) {
+    try {
+        delete[] tensors;
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Pow(Tensor a, int64_t b, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->pow(b));
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *FloatPower(Tensor a, float b, Tensor *result) {
+  try {
+    *result = new at::Tensor(a->float_power(b));
     return nullptr;
   } catch (const std::exception &e) {
     return exception_str(e.what());

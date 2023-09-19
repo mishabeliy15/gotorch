@@ -54,7 +54,9 @@ const char *MaxPool2d(Tensor input, int64_t *kernel_data, int64_t kernel_len,
 
 const char *AdaptiveAvgPool2d(Tensor input, int64_t *output_size_data,
                               int64_t output_size_len, Tensor *result);
-
+const char *GridSample(Tensor input, Tensor grid, const char *mode,
+                       const char *padding_mode, bool align_corners,
+                       Tensor *result);
 #ifdef __cplusplus
 }
 #endif

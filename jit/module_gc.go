@@ -13,6 +13,8 @@ import (
 // SetModuleFinalizer sets a finalizer to the Module
 func SetModuleFinalizer(t *unsafe.Pointer) {
 	runtime.SetFinalizer(t, func(ct *unsafe.Pointer) {
-		C.Module_Close(C.Module(*ct))
+		if ct != nil {
+			C.Module_Close(C.Module(*ct))
+		}
 	})
 }

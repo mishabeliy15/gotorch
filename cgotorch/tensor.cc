@@ -228,7 +228,7 @@ const char *Tensor_Split(Tensor input, int64_t split_size, int64_t dim,
   try {
       auto split = input->split(split_size, dim);
       *results_len = split.size();
-      for (int i = 0; i < *results_len; i++) {
+      for (int64_t i = 0; i < *results_len; i++) {
         results[i] = new at::Tensor(split[i]);
       }
     return nullptr;
@@ -311,6 +311,15 @@ const char *Tensor_GeScalar(Tensor input, float other, Tensor *result) {
   }
 }
 
+const char *Tensor_LessScalar(Tensor input, float other, Tensor *result) {
+    try {
+        *result = new at::Tensor(input->less(other));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
 const char *Tensor_NonZero(Tensor input, Tensor *result) {
   try {
     *result = new at::Tensor(input->nonzero());
@@ -366,6 +375,33 @@ const char *Tensor_IndexByTensors(Tensor input, Tensor *indexes, int64_t index_l
 const char *Tensor_Device(Tensor input, Device *device) {
   try {
     *device = new at::Device(input->device());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Index_fill(Tensor input, int64_t dim, Tensor index, float value) {
+  try {
+    input->index_fill(dim, *index, value);
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_Contiguous(Tensor input, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->contiguous());
+    return nullptr;
+  } catch (const std::exception &e) {
+    return exception_str(e.what());
+  }
+}
+
+const char *Tensor_MaskedSelect(Tensor input, Tensor mask, Tensor *result) {
+  try {
+    *result = new at::Tensor(input->masked_select(*mask));
     return nullptr;
   } catch (const std::exception &e) {
     return exception_str(e.what());
